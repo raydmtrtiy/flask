@@ -76,6 +76,36 @@ def create_article():
         return render_template("create_article.html")
 
 
+@app.route('/posts/<int:post_id>/delete')
+def post_delete(post_id):
+    article = Article.query.get_or_404(post_id)
+
+    try:
+        db.session.delete(article)
+        db.session.commit()
+        return redirect('/posts')
+    except:
+        return 'An error occurred while deleting the article'
+
+
+@app.route('/posts/<int:post_id>/update', methods=['POST', 'GET'])
+def create_update(post_id):
+    article = Article.query.get(post_id)
+    if request.method == 'POST':
+        article.title = request.form.get("title", '')
+        article.intro = request.form['intro']
+        article.text = request.form['text']
+
+        try:
+            db.session.commit()
+            return redirect('/posts')
+        except:
+            return "An error occurred while editing the article"
+    else:
+
+        return render_template("post_update.html", article=article)
+
+
 if __name__ == "__main__":
     app.run(
         debug=True,
